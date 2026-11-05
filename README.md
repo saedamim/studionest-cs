@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StudioNest — Creative Studio Booking Platform
 
-## Getting Started
+A modern peer-to-peer marketplace where creators can discover, explore, and book professional creative studios.
 
-First, run the development server:
+🌐 **Live Website:** [Add Your Live Website URL]
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+💻 **Client Repository:** [Add Your Client GitHub URL]
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## About the Project
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+StudioNest is a creative workspace booking platform designed for photographers, filmmakers, podcasters, musicians, and other creators.
 
-## Learn More
+Users can explore different creative spaces, view studio details, book available workspaces, and manage their reservations. Studio owners can also list and manage their own studios through a personalized dashboard.
 
-To learn more about Next.js, take a look at the following resources:
+## Key Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Authentication:** Secure registration and login using Better Auth with email/password and Google authentication.
+- **Explore Studios:** Browse creative workspaces with category-based filtering.
+- **Featured Studios:** Discover top-rated and recently added studios.
+- **Studio Details:** View studio descriptions, images, pricing, amenities, and host information.
+- **Studio Management:** Add, edit, and delete personal studio listings.
+- **Booking System:** Book creative spaces and manage reservations.
+- **My Bookings:** View booking history and cancel pending reservations.
+- **User Dashboard:** Manage studio listings, bookings, and account information.
+- **Responsive Design:** Optimized for mobile, tablet, and desktop devices.
+- **Dark/Light Theme:** Switch between light and dark modes.
+- **Toast Notifications:** Modern feedback using toast notifications.
+- **Loading & Empty States:** Branded loading indicators and friendly empty states.
+- **Custom 404 Page:** Custom not-found page with a home navigation option.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Technology Stack
 
-## Deploy on Vercel
+- Next.js (App Router)
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Lucide React
+- Better Auth
+- Sonner
+- MongoDB (through backend APIs)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Main Pages
+
+| Route | Description |
+|---|---|
+| `/` | Homepage |
+| `/studios` | Explore Studios |
+| `/studios/[id]` | Studio Details |
+| `/login` | Login |
+| `/register` | Registration |
+| `/dashboard` | User Dashboard |
+| `/add-studio` | Add New Studio |
+| `/my-listings` | My Studio Listings |
+| `/my-bookings` | My Bookings |
+| `/studios/edit/[id]` | Edit Studio |
+
+
+
+## Examiner Test Credentials
+
+| Field | Value |
+|---|---|
+| Live Website | YOUR_LIVE_WEBSITE_URL |
+| Email | YOUR_TEST_EMAIL |
+| Password | YOUR_TEST_PASSWORD |
+
+Replace these placeholders with working examiner credentials before submission.
+
+## Author
+
+**Name:**Saeda Yeasmin
+
+**GitHub:** [Your GitHub Profile](YOUR_GITHUB_PROFILE_URL)
+
+**Project:** StudioNest
+
+---
+
+Developed with ❤️ for creators and creative communities.
+
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
