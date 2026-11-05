@@ -1,5 +1,10 @@
 import DashboardShell from "@/components/DashboardShell";
+import { Suspense } from "react";
 
 export default function DashboardLayout({ children }: LayoutProps<"/dashboard">) {
-  return <DashboardShell>{children}</DashboardShell>;
+  return (
+    <Suspense fallback={<div className="p-6">Loading dashboard...</div>}>
+      <DashboardShell>{children}</DashboardShell>
+    </Suspense>
+  );
 }

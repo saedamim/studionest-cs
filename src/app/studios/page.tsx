@@ -27,7 +27,7 @@ const StudiosPage = () => {
         }
 
         const data = await res.json();
-        setStudios(data);
+        setStudios(data.studios);
       } catch (error) {
         console.error(error);
       } finally {
