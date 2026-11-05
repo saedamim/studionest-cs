@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -10,6 +10,7 @@ import {
   useCarousel,
 } from "@/components/ui/carousel";
 import { FiArrowLeft, FiArrowRight, FiArrowUpRight, FiMapPin, FiStar } from "react-icons/fi";
+import { apiFetch } from "@/lib/api";
 
 type StudioCategory =
   | "Photography Studios"
@@ -19,86 +20,44 @@ type StudioCategory =
   | "Art Workshops";
 
 type Studio = {
-
   id: string;
   name: string;
   category: StudioCategory;
   location: string;
   hourlyRate: number;
-  rating: number;
-  reviewCount: number;
+  rating?: number;
+  reviewCount?: number;
   imageUrl: string;
-  imageAlt: string;
+  description?: string;
 };
 
-const studios: Studio[] = [
-  {
-    id: "north-light-loft",
-    name: "The North Light Loft",
-    category: "Photography Studios",
-    location: "Brooklyn, New York",
-    hourlyRate: 95,
-    rating: 4.98,
-    reviewCount: 126,
-    imageUrl: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1000&q=85",
-    imageAlt: "Bright loft studio with large industrial windows and creative work tables",
-  },
-  {
-    id: "atelier-cinema",
-    name: "Atelier Cinema House",
-    category: "Film & Production Studios",
-    location: "Los Angeles, California",
-    hourlyRate: 180,
-    rating: 4.96,
-    reviewCount: 84,
-    imageUrl: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1000&q=85",
-    imageAlt: "Warm production studio set with cinematic lighting",
-  },
-  {
-    id: "the-sound-room",
-    name: "The Sound Room",
-    category: "Podcast Rooms",
-    location: "Queens, New York",
-    hourlyRate: 65,
-    rating: 4.93,
-    reviewCount: 57,
-    imageUrl: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1000&q=85",
-    imageAlt: "Professional recording studio with mixing desk and acoustic treatment",
-  },
-  {
-    id: "golden-hour-studio",
-    name: "Golden Hour Studio",
-    category: "Photography Studios",
-    location: "Austin, Texas",
-    hourlyRate: 110,
-    rating: 4.99,
-    reviewCount: 102,
-    imageUrl: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85",
-    imageAlt: "Sunlit modern creative studio with warm neutral interiors",
-  },
-  {
-    id: "analog-house",
-    name: "Analog House",
-    category: "Music Recording Studios",
-    location: "Nashville, Tennessee",
-    hourlyRate: 135,
-    rating: 4.97,
-    reviewCount: 73,
-    imageUrl: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1000&q=85",
-    imageAlt: "Intimate music studio filled with instruments and recording gear",
-  },
-  {
-    id: "the-makers-table",
-    name: "The Makers Table",
-    category: "Art Workshops",
-    location: "Portland, Oregon",
-    hourlyRate: 72,
-    rating: 4.91,
-    reviewCount: 49,
-    imageUrl: "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=1000&q=85",
-    imageAlt: "Light-filled artist workshop with a communal work table",
-  },
-];
+type StudioApiRecord = {
+  _id: string;
+  name: string;
+  category: string;
+  location: string;
+  hourlyRate?: number;
+  price?: number;
+  rating?: number;
+  reviewCount?: number;
+  imageUrl?: string;
+  image?: string;
+  description?: string;
+};
+
+function normalizeStudio(studio: StudioApiRecord): Studio {
+  return {
+    id: studio._id,
+    name: studio.name,
+    category: studio.category as StudioCategory,
+    location: studio.location,
+    hourlyRate: studio.hourlyRate ?? studio.price ?? 0,
+    rating: studio.rating,
+    reviewCount: studio.reviewCount,
+    imageUrl: studio.imageUrl ?? studio.image ?? "",
+    description: studio.description,
+  };
+}
 
 const categories: Array<"All Spaces" | StudioCategory> = [
   "All Spaces",
@@ -112,6 +71,25 @@ const categories: Array<"All Spaces" | StudioCategory> = [
 export default function ExploreStudios() {
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>("All Spaces");
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [studios, setStudios] = useState<Studio[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    apiFetch<{ studios: StudioApiRecord[] }>("/studios")
+      .then((response) => {
+        if (active) setStudios(response.studios.map(normalizeStudio));
+      })
+      .catch((error: unknown) => {
+        if (active) setLoadError(error instanceof Error ? error.message : "Could not load studios.");
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => { active = false; };
+  }, []);
+
   const visibleStudios =
     activeCategory === "All Spaces"
       ? studios
@@ -179,7 +157,7 @@ export default function ExploreStudios() {
                     <div className="relative aspect-4/3 overflow-hidden bg-surface-muted">
                       <div
                         role="img"
-                        aria-label={studio.imageAlt}
+                          aria-label={studio.name}
                         className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
                         style={{ backgroundImage: `url("${studio.imageUrl}")` }}
                       />
@@ -200,7 +178,7 @@ export default function ExploreStudios() {
                         </div>
                         <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-foreground">
                           <FiStar aria-hidden="true" className="size-4 fill-[#d7a85e] text-[#d7a85e]" />
-                          {studio.rating.toFixed(2)}
+                          {typeof studio.rating === "number" ? studio.rating.toFixed(1) : "New"}
                         </span>
                       </div>
                       <div className="mt-5 flex items-center justify-between border-t border-border-soft pt-4">
@@ -211,14 +189,18 @@ export default function ExploreStudios() {
                           View Details <FiArrowUpRight aria-hidden="true" className="size-4" />
                         </span>
                       </div>
-                      <span className="sr-only">Rated {studio.rating} out of 5 from {studio.reviewCount} reviews</span>
+                      {typeof studio.rating === "number" && (
+                        <span className="sr-only">Rated {studio.rating} out of 5 from {studio.reviewCount ?? 0} reviews</span>
+                      )}
                     </div>
                   </Link>
                 </article>
               </CarouselItem>
             ))}
           </CarouselContent>
-          {visibleStudios.length === 0 && (
+          {isLoading && <p role="status" className="px-4 py-12 text-center text-sm text-foreground-muted">Loading creative spaces…</p>}
+          {!isLoading && loadError && <p role="alert" className="px-4 py-12 text-center text-sm text-destructive">{loadError}</p>}
+          {!isLoading && !loadError && visibleStudios.length === 0 && (
             <p className="px-4 py-12 text-center text-sm text-foreground-muted">No studios in this category yet.</p>
           )}
         </Carousel>

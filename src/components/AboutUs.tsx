@@ -44,14 +44,12 @@ export default function AboutUs() {
               </li>
             ))}
           </ul>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 ">
             <Link href="/studios" className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand px-6 text-sm font-semibold text-brand-foreground transition hover:opacity-85">
               Explore Studios
               <FiArrowUpRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
-            <Link href="/add-studio" className="inline-flex min-h-12 items-center justify-center rounded-full border border-border-soft px-6 text-sm font-semibold text-foreground transition hover:border-foreground hover:bg-surface/60">
-              Become a Host
-            </Link>
+           
           </div>
         </div>
       </div>
