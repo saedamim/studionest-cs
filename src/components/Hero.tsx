@@ -3,7 +3,7 @@ import { FiArrowUpRight } from "react-icons/fi";
 
 export default function Hero() {
   return (
-    <section className="relative isolate flex min-h-[720px] min-h-[100svh] items-center justify-center overflow-hidden bg-[#28231d] text-white">
+    <section className="relative isolate -mt-19 flex min-h-[max(100svh,45rem)] items-center justify-center overflow-hidden bg-[#28231d] text-white">
       <div
         aria-hidden="true"
         className="absolute inset-0 -z-20 bg-cover bg-center"
@@ -12,7 +12,7 @@ export default function Hero() {
             "url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2400&q=90')",
         }}
       />
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/35 to-black/65" />
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-b from-black/55 via-black/35 to-black/65" />
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-black/15" />
 
       <div className="mx-auto flex w-full max-w-5xl flex-col items-center px-6 pb-12 pt-28 text-center sm:px-10">

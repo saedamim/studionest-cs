@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { useTheme } from "next-themes";
 import {
   FiAperture,
   FiChevronDown,
@@ -11,6 +12,8 @@ import {
   FiLogOut,
   FiMenu,
   FiPlus,
+  FiMoon,
+  FiSun,
   FiUser,
   FiX,
 } from "react-icons/fi";
@@ -45,6 +48,12 @@ export default function Navbar({ user = null, onLogout }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  const { resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
     const updateScrollState = () => setIsScrolled(window.scrollY > 24);
@@ -59,22 +68,36 @@ export default function Navbar({ user = null, onLogout }: NavbarProps) {
   };
 
   const navLinkClass = (active: boolean) =>
-    `relative whitespace-nowrap py-2 text-sm font-medium transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-white after:transition-transform hover:text-white after:content-[''] ${
-      active ? "text-white after:scale-x-100" : "text-white/75 hover:after:scale-x-100"
+    `relative whitespace-nowrap py-2 text-sm font-medium transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:transition-transform after:content-[''] ${
+      isScrolled && resolvedTheme !== "dark"
+        ? `after:bg-[#302a24] hover:text-[#302a24] ${active ? "text-[#302a24] after:scale-x-100" : "text-[#302a24]/70 hover:after:scale-x-100"}`
+        : `after:bg-white hover:text-white ${active ? "text-white after:scale-x-100" : "text-white/75 hover:after:scale-x-100"}`
     }`;
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+      className={`sticky inset-x-0 top-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "border-b border-white/10 bg-[#181612]/90 shadow-lg shadow-black/10 backdrop-blur-xl"
+          ? resolvedTheme === "dark"
+            ? "border-b border-white/10 bg-[#181612]/90 shadow-lg shadow-black/10 backdrop-blur-xl"
+            : "border-b border-black/5 bg-white/90 shadow-lg shadow-black/5 backdrop-blur-xl"
           : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
-        <Link href="/" aria-label="StudioNest home" className="flex shrink-0 items-center gap-2.5 text-white">
-          <span className="flex size-10 items-center justify-center rounded-full border border-white/35 bg-white/10">
-            <FiAperture aria-hidden="true" className="size-[21px]" />
+      <div className="mx-auto flex h-19 max-w-360 items-center justify-between px-5 sm:px-8 lg:px-12">
+        <Link
+          href="/"
+          aria-label="StudioNest home"
+          className={`flex shrink-0 items-center gap-2.5 transition-colors duration-300 ${
+            resolvedTheme === "dark" || !mounted
+              ? "text-white"
+              : isScrolled
+                ? "text-[#29251f]"
+                : "rounded-full bg-white/90 py-1 pl-1 pr-3 text-[#29251f] shadow-lg shadow-black/10"
+          }`}
+        >
+          <span className={`flex size-10 items-center justify-center rounded-full border transition-colors ${resolvedTheme === "dark" || !mounted || isScrolled ? "border-white/25 bg-white/10" : "border-[#302a24]/10 bg-white"}`}>
+            <FiAperture aria-hidden="true" className="size-5.25" />
           </span>
           <span className="font-serif text-[25px] font-semibold tracking-[-0.06em]">
             Studio<span className="font-normal">Nest</span>
@@ -90,6 +113,12 @@ export default function Navbar({ user = null, onLogout }: NavbarProps) {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <ThemeToggle
+            mounted={mounted}
+            isDark={resolvedTheme === "dark"}
+            onToggle={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            lightOnHero={!isScrolled && resolvedTheme !== "dark"}
+          />
           {user ? (
             <div className="relative" onMouseLeave={() => setProfileOpen(false)}>
               <button
@@ -108,7 +137,7 @@ export default function Navbar({ user = null, onLogout }: NavbarProps) {
             </div>
           ) : (
             <>
-              <Link href="/login" className="rounded-full px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10">
+              <Link href="/login" className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${isScrolled && resolvedTheme !== "dark" ? "text-[#29251f] hover:bg-black/5" : "text-white hover:bg-white/10"}`}>
                 Login
               </Link>
               <Link href="/register" className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#28241f] transition hover:bg-[#f1e8dc]">
@@ -123,17 +152,25 @@ export default function Navbar({ user = null, onLogout }: NavbarProps) {
           aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((open) => !open)}
-          className="flex size-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white lg:hidden"
+          className={`flex size-11 items-center justify-center rounded-full border transition-colors lg:hidden ${isScrolled && resolvedTheme !== "dark" ? "border-black/10 bg-black/5 text-[#29251f]" : "border-white/25 bg-white/10 text-white"}`}
         >
           {mobileOpen ? <FiX className="size-5" /> : <FiMenu className="size-5" />}
         </button>
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-white/10 bg-[#181612]/95 px-5 pb-6 pt-3 backdrop-blur-xl lg:hidden">
-          <nav aria-label="Mobile navigation" className="mx-auto flex max-w-[1440px] flex-col">
+        <div className={`border-t px-5 pb-6 pt-3 backdrop-blur-xl lg:hidden ${resolvedTheme === "dark" ? "border-white/10 bg-[#181612]/95" : "border-black/10 bg-white/95"}`}>
+          <nav aria-label="Mobile navigation" className={`mx-auto flex max-w-360 flex-col ${resolvedTheme === "dark" ? "text-white" : "text-[#29251f]"}`}>
+            <div className="flex justify-end border-b border-current/10 py-2">
+              <ThemeToggle
+                mounted={mounted}
+                isDark={resolvedTheme === "dark"}
+                onToggle={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                lightOnHero={false}
+              />
+            </div>
             {links.map((link) => (
-                <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)} className={`border-b border-white/10 py-3.5 text-sm font-medium ${linkIsActive(link.href) ? "text-white" : "text-white/75"}`}>
+                <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)} className={`border-b border-current/10 py-3.5 text-sm font-medium ${linkIsActive(link.href) ? "opacity-100" : "opacity-70"}`}>
                 {link.label}
               </Link>
             ))}
@@ -144,13 +181,13 @@ export default function Navbar({ user = null, onLogout }: NavbarProps) {
                   <span className="font-medium">{user.name}</span>
                 </div>
                 {accountLinks.map(({ label, href }) => (
-                  <Link key={href} href={href} onClick={() => setMobileOpen(false)} className="py-3 text-sm text-white/75">{label}</Link>
+                  <Link key={href} href={href} onClick={() => setMobileOpen(false)} className="py-3 text-sm opacity-75">{label}</Link>
                 ))}
-                <button type="button" onClick={onLogout} disabled={!onLogout} className="py-3 text-left text-sm text-white/75 disabled:cursor-not-allowed disabled:opacity-50">Log out</button>
+                <button type="button" onClick={onLogout} disabled={!onLogout} className="py-3 text-left text-sm opacity-75 disabled:cursor-not-allowed disabled:opacity-50">Log out</button>
               </>
             ) : (
               <div className="flex gap-3 pt-5">
-                <Link href="/login" className="flex-1 rounded-full border border-white/35 px-4 py-3 text-center text-sm font-semibold text-white">Login</Link>
+                <Link href="/login" className="flex-1 rounded-full border border-current/35 px-4 py-3 text-center text-sm font-semibold">Login</Link>
                 <Link href="/register" className="flex-1 rounded-full bg-white px-4 py-3 text-center text-sm font-semibold text-[#28241f]">Register</Link>
               </div>
             )}
@@ -158,6 +195,43 @@ export default function Navbar({ user = null, onLogout }: NavbarProps) {
         </div>
       )}
     </header>
+  );
+}
+
+function ThemeToggle({
+  mounted,
+  isDark,
+  lightOnHero,
+  onToggle,
+}: {
+  mounted: boolean;
+  isDark: boolean;
+  lightOnHero: boolean;
+  onToggle: () => void;
+}) {
+  // Keep the server render and the first client render identical. next-themes
+  // resolves the saved/system theme after hydration, so theme-dependent styles
+  // must wait for mounted just like the icon and accessible label.
+  const activeThemeIsDark = mounted && isDark;
+  const activeLightOnHero = mounted && lightOnHero;
+  const Icon = activeThemeIsDark ? FiSun : FiMoon;
+
+  return (
+    <button
+      type="button"
+      aria-label={mounted ? `Switch to ${activeThemeIsDark ? "light" : "dark"} mode` : "Toggle color theme"}
+      title={mounted ? `Switch to ${activeThemeIsDark ? "light" : "dark"} mode` : "Toggle color theme"}
+      onClick={onToggle}
+      className={`flex size-10 shrink-0 items-center justify-center rounded-full border transition duration-300 hover:rotate-[-8deg] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d7bba0] ${
+        activeLightOnHero
+          ? "border-white/30 bg-white/10 text-white hover:bg-white/20"
+          : activeThemeIsDark
+            ? "border-white/15 bg-white/5 text-[#e2c7a8] hover:bg-white/10"
+            : "border-black/10 bg-black/5 text-[#514337] hover:bg-black/10"
+      }`}
+    >
+      {mounted ? <Icon aria-hidden="true" className="size-4.5" /> : <FiMoon aria-hidden="true" className="size-4.5" />}
+    </button>
   );
 }
 
@@ -178,9 +252,9 @@ function Avatar({ user }: { user: NavbarUser }) {
 
 function ProfileMenu({ onLogout }: { onLogout?: () => void }) {
   return (
-    <div role="menu" className="absolute right-0 top-full mt-3 w-56 overflow-hidden rounded-2xl border border-black/5 bg-white p-2 text-[#29251f] shadow-xl shadow-black/20">
+    <div role="menu" className="absolute right-0 top-full mt-3 w-56 overflow-hidden rounded-2xl border border-border-soft bg-surface p-2 text-foreground shadow-xl shadow-black/20">
       {accountLinks.map(({ label, href, icon: Icon }) => (
-        <Link key={href} role="menuitem" href={href} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition hover:bg-[#f6f3ef]">
+        <Link key={href} role="menuitem" href={href} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition hover:bg-surface-muted">
           <Icon aria-hidden="true" className="size-4 text-[#827364]" />
           {label}
         </Link>

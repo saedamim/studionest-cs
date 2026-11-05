@@ -54,19 +54,19 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-[#181612] text-white">
+    <footer className="bg-surface text-foreground transition-colors duration-300">
       <div className="mx-auto max-w-360 px-6 pb-8 pt-16 sm:px-8 sm:pt-20 lg:px-12 lg:pt-24">
         <div className="grid gap-x-10 gap-y-12 md:grid-cols-2 lg:grid-cols-[1.2fr_0.7fr_1fr_1.35fr] lg:gap-x-12">
           <section aria-labelledby="footer-brand" className="max-w-sm">
             <Link href="/" aria-label="StudioNest home" className="inline-flex items-center gap-2.5">
-              <span className="flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/6 text-[#e2c7a8]">
+              <span className="flex size-10 items-center justify-center rounded-full border border-border-soft bg-surface-muted text-[#92765b] dark:text-[#e2c7a8]">
                 <FiAperture aria-hidden="true" className="size-5.25" />
               </span>
-              <span id="footer-brand" className="font-serif text-[25px] font-semibold tracking-[-0.06em]">
+              <span id="footer-brand" className="font-serif text-[25px] font-semibold tracking-[-0.06em] text-foreground">
                 Studio<span className="font-normal">Nest</span>
               </span>
             </Link>
-            <p className="mt-5 max-w-xs text-sm leading-7 text-white/60">
+            <p className="mt-5 max-w-xs text-sm leading-7 text-foreground-muted">
               Connecting creators with inspiring spaces to bring their creative visions to life.
             </p>
             <nav aria-label="Social media" className="mt-7 flex items-center gap-2.5">
@@ -77,7 +77,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={`StudioNest on ${label}`}
-                  className="flex size-10 items-center justify-center rounded-full border border-white/15 text-white/70 transition duration-200 hover:-translate-y-0.5 hover:border-[#d7bba0]/60 hover:bg-[#d7bba0]/10 hover:text-[#e2c7a8]"
+                  className="flex size-10 items-center justify-center rounded-full border border-border-soft text-foreground-muted transition duration-200 hover:-translate-y-0.5 hover:border-[#d7bba0]/60 hover:bg-[#d7bba0]/10 hover:text-[#765f48] dark:hover:text-[#e2c7a8]"
                 >
                   <Icon aria-hidden="true" className="size-4" />
                 </a>
@@ -86,13 +86,13 @@ export default function Footer() {
           </section>
 
           <nav aria-labelledby="footer-quick-links">
-            <h2 id="footer-quick-links" className="text-xs font-semibold uppercase tracking-[0.18em] text-white">
+            <h2 id="footer-quick-links" className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground">
               Quick Links
             </h2>
             <ul className="mt-5 space-y-3.5">
               {quickLinks.map(({ label, href }) => (
                 <li key={label}>
-                  <Link href={href} className="text-sm text-white/60 transition-colors hover:text-white">
+                  <Link href={href} className="text-sm text-foreground-muted transition-colors hover:text-foreground">
                     {label}
                   </Link>
                 </li>
@@ -101,13 +101,13 @@ export default function Footer() {
           </nav>
 
           <nav aria-labelledby="footer-categories">
-            <h2 id="footer-categories" className="text-xs font-semibold uppercase tracking-[0.18em] text-white">
+            <h2 id="footer-categories" className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground">
               Explore Categories
             </h2>
             <ul className="mt-5 space-y-3.5">
               {categories.map(({ label, slug }) => (
                 <li key={slug}>
-                  <Link href={`/studios?category=${slug}`} className="text-sm text-white/60 transition-colors hover:text-white">
+                  <Link href={`/studios?category=${slug}`} className="text-sm text-foreground-muted transition-colors hover:text-foreground">
                     {label}
                   </Link>
                 </li>
@@ -116,17 +116,17 @@ export default function Footer() {
           </nav>
 
           <section aria-labelledby="footer-newsletter">
-            <h2 id="footer-newsletter" className="text-xs font-semibold uppercase tracking-[0.18em] text-white">
+            <h2 id="footer-newsletter" className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground">
               Stay Inspired
             </h2>
-            <p className="mt-5 max-w-sm text-sm leading-6 text-white/60">
+            <p className="mt-5 max-w-sm text-sm leading-6 text-foreground-muted">
               Get updates about inspiring creative spaces, new listings, and exclusive offers.
             </p>
             <form noValidate onSubmit={handleSubscribe} className="mt-5">
               <label htmlFor="newsletter-email" className="sr-only">
                 Email address
               </label>
-              <div className="flex min-h-12 items-center rounded-full border border-white/20 bg-white/6 p-1.5 transition focus-within:border-[#d7bba0]/70 focus-within:ring-2 focus-within:ring-[#d7bba0]/20">
+              <div className="flex min-h-12 items-center rounded-full border border-border-soft bg-surface-muted p-1.5 transition focus-within:border-[#d7bba0]/70 focus-within:ring-2 focus-within:ring-[#d7bba0]/20">
                 <input
                   id="newsletter-email"
                   name="email"
@@ -141,7 +141,7 @@ export default function Footer() {
                   }}
                   placeholder="Your email address"
                   aria-describedby="newsletter-feedback"
-                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-white outline-none placeholder:text-white/40"
+                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-foreground outline-none placeholder:text-foreground-muted"
                 />
                 <button
                   type="submit"
@@ -162,16 +162,16 @@ export default function Footer() {
           </section>
         </div>
 
-        <div className="mt-12 flex flex-col gap-5 border-t border-white/10 pt-6 sm:mt-16 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-white/45">© 2026 StudioNest. All rights reserved.</p>
+        <div className="mt-12 flex flex-col gap-5 border-t border-border-soft pt-6 sm:mt-16 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-foreground-muted">© 2026 StudioNest. All rights reserved.</p>
           <nav aria-label="Legal" className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <Link href="/privacy" className="text-xs text-white/50 transition-colors hover:text-white">
+            <Link href="/privacy" className="text-xs text-foreground-muted transition-colors hover:text-foreground">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="text-xs text-white/50 transition-colors hover:text-white">
+            <Link href="/terms" className="text-xs text-foreground-muted transition-colors hover:text-foreground">
               Terms &amp; Conditions
             </Link>
-            <Link href="/studios" aria-label="Explore studios" className="hidden items-center gap-1 text-xs text-[#e2c7a8] transition-colors hover:text-white md:inline-flex">
+            <Link href="/studios" aria-label="Explore studios" className="hidden items-center gap-1 text-xs text-[#92765b] transition-colors hover:text-foreground dark:text-[#e2c7a8] md:inline-flex">
               Find a space <FiArrowUpRight aria-hidden="true" className="size-3.5" />
             </Link>
           </nav>
