@@ -138,7 +138,7 @@ export default function BookingForm() {
           guests: guestCount,
           requirements: values.requirements.trim(),
         }),
-      }, true);
+      });
 
       toast.add({ title: "Booking request sent", description: "Your request is pending confirmation.", type: "success" });
       router.replace("/dashboard/my-bookings");

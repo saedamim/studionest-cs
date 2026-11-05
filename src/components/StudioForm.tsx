@@ -39,7 +39,7 @@ export default function StudioForm({ studioId }: { studioId?: string }) {
   useEffect(() => {
     if (!studioId) return;
     let active = true;
-    apiFetch<StudioRecord>(`/my-listings/${encodeURIComponent(studioId)}`, {}, true)
+    apiFetch<StudioRecord>(`/my-listings/${encodeURIComponent(studioId)}`)
       .then((studio) => {
         if (!active) return;
         setValues({
@@ -90,7 +90,7 @@ export default function StudioForm({ studioId }: { studioId?: string }) {
           amenities: values.amenities.split(",").map((item) => item.trim()).filter(Boolean),
           availability: values.availability.split(",").map((item) => item.trim()).filter(Boolean),
         }),
-      }, true);
+      });
       toast.add({ title: studioId ? "Studio updated" : "Studio listed", description: studioId ? "Your changes have been saved." : "Your studio is now available to explore.", type: "success" });
       router.push("/dashboard/my-listings");
     } catch (requestError) {

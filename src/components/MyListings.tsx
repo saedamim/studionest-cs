@@ -19,7 +19,7 @@ export default function MyListings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const loadListings = useCallback(async () => {
-    try { setError(""); setStudios(await apiFetch<Studio[]>("/my-listings", {}, true)); }
+    try { setError(""); setStudios(await apiFetch<Studio[]>("/my-listings")); }
     catch (e) { setError(e instanceof Error ? e.message : "Could not load listings."); }
     finally { setLoading(false); }
   }, []);
@@ -32,7 +32,7 @@ export default function MyListings() {
   async function deleteStudio(studio: Studio) {
     if (!window.confirm(`Delete “${studio.name}”? This cannot be undone.`)) return;
     try {
-      await apiFetch(`/studios/${studio._id}`, { method: "DELETE" }, true);
+      await apiFetch(`/studios/${studio._id}`, { method: "DELETE" });
       setStudios((current) => current.filter((item) => item._id !== studio._id));
       toast.add({ title: "Studio deleted", description: `${studio.name} was removed.`, type: "success" });
     } catch (e) { toast.add({ title: "Could not delete studio", description: e instanceof Error ? e.message : "Try again.", type: "error" }); }

@@ -9,8 +9,8 @@ import { toast } from "@/components/ui/toast";
 const quickLinks = [
   { label: "Home", href: "/" },
   { label: "Explore Studios", href: "/studios" },
-  { label: "How It Works", href: "/#how-it-works" },
-  { label: "About Us", href: "/#about" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "About Us", href: "/about" },
 ];
 
 const categories = [

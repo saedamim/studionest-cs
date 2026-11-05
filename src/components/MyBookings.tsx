@@ -17,7 +17,7 @@ export default function MyBookings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const loadBookings = useCallback(async () => {
-    try { setError(""); setBookings(await apiFetch<Booking[]>("/my-bookings", {}, true)); }
+    try { setError(""); setBookings(await apiFetch<Booking[]>("/my-bookings")); }
     catch (e) { setError(e instanceof Error ? e.message : "Could not load bookings."); }
     finally { setLoading(false); }
   }, []);
@@ -30,7 +30,7 @@ export default function MyBookings() {
   async function cancelBooking(booking: Booking) {
     if (!window.confirm(`Cancel your booking for ${booking.studioName}?`)) return;
     try {
-      await apiFetch(`/bookings/${booking._id}/cancel`, { method: "PATCH" }, true);
+      await apiFetch(`/bookings/${booking._id}/cancel`, { method: "PATCH" });
       setBookings((items) => items.map((item) => item._id === booking._id ? { ...item, status: "Cancelled" } : item));
       toast.add({ title: "Booking cancelled", description: "The pending booking was cancelled.", type: "success" });
     } catch (e) { toast.add({ title: "Could not cancel booking", description: e instanceof Error ? e.message : "Try again.", type: "error" }); }

@@ -35,16 +35,16 @@ import {
 const links = [
   { label: "Home", href: "/" },
   { label: "Explore Studios", href: "/studios" },
-  { label: "How It Works", href: "/#how-it-works" },
-  { label: "About Us", href: "/#about" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "About Us", href: "/about" },
 ];
 
 const accountLinks = [
   { label: "My Profile", href: "/profile", icon: UserRound },
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "My Bookings", href: "/my-bookings", icon: CalendarDays },
-  { label: "My Studio Listings", href: "/my-studios", icon: Warehouse },
-  { label: "Add New Studio", href: "/add-studio", icon: Plus },
+  { label: "My Bookings", href: "/dashboard/my-bookings", icon: CalendarDays },
+  { label: "My Studio Listings", href: "/dashboard/my-listings", icon: Warehouse },
+  { label: "Add New Studio", href: "/dashboard/add-studio", icon: Plus },
 ];
 
 export default function Navbar() {

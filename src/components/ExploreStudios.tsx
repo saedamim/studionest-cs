@@ -46,10 +46,21 @@ type StudioApiRecord = {
 };
 
 function normalizeStudio(studio: StudioApiRecord): Studio {
+  const categoryAliases: Record<string, StudioCategory> = {
+    photography: "Photography Studios",
+    film: "Film & Production Studios",
+    production: "Film & Production Studios",
+    podcast: "Podcast Rooms",
+    music: "Music Recording Studios",
+    art: "Art Workshops",
+  };
+  const category = categories.find((item) => item.toLowerCase() === studio.category.toLowerCase())
+    ?? categoryAliases[studio.category.toLowerCase()]
+    ?? (studio.category as StudioCategory);
   return {
     id: studio._id,
     name: studio.name,
-    category: studio.category as StudioCategory,
+    category,
     location: studio.location,
     hourlyRate: studio.hourlyRate ?? studio.price ?? 0,
     rating: studio.rating,

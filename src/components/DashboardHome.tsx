@@ -18,7 +18,7 @@ export default function DashboardHome() {
   useEffect(() => {
     if (isPending || !session?.user) return;
     let active = true;
-    Promise.all([apiFetch<Studio[]>("/my-listings", {}, true), apiFetch<Booking[]>("/my-bookings", {}, true)])
+    Promise.all([apiFetch<Studio[]>("/my-listings"), apiFetch<Booking[]>("/my-bookings")])
       .then(([studios, bookings]) => { if (active) setCounts({ studios: studios.length, bookings: bookings.length, pending: bookings.filter((booking) => booking.status === "Pending").length }); })
       .catch(() => { if (active) setCounts({ studios: 0, bookings: 0, pending: 0 }); })
       .finally(() => { if (active) setLoading(false); });

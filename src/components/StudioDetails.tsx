@@ -24,6 +24,7 @@ type Studio = {
   rating?: number;
   reviewCount?: number;
   ownerName?: string;
+  ownerEmail?: string;
 };
 
 export default function StudioDetails({ id }: { id: string }) {
