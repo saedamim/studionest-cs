@@ -4,7 +4,7 @@ A modern peer-to-peer marketplace where creators can discover, explore, and book
 
 🌐 **Live Website:** [Add Your Live Website URL]
 
-💻 **Client Repository:** [Add Your Client GitHub URL]
+💻 **Client Repository:** (https://github.com/saedamim/studionest-cs.git)
 
 ---
 
@@ -73,7 +73,7 @@ Replace these placeholders with working examiner credentials before submission.
 
 **Name:**Saeda Yeasmin
 
-**GitHub:** [Your GitHub Profile](YOUR_GITHUB_PROFILE_URL)
+**GitHub:**(https://github.com/saedamim)
 
 **Project:** StudioNest
 
@@ -82,4 +82,3 @@ Replace these placeholders with working examiner credentials before submission.
 Developed with ❤️ for creators and creative communities.
 
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
