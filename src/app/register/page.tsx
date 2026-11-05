@@ -3,7 +3,8 @@ import RegisterForm from "@/components/RegisterForm";
 
 export default function RegisterPage() {
     const googleConfigured = Boolean(
-        process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
+        process.env.BETTER_AUTH_GOOGLE_CLIENT_ID &&
+            process.env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
     );
 
     return (

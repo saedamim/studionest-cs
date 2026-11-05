@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Aperture, Eye, EyeOff, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { authClient } from "@/lib/auth-client";
@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 
 export default function LoginForm({ googleConfigured }: { googleConfigured: boolean }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -22,54 +21,6 @@ export default function LoginForm({ googleConfigured }: { googleConfigured: bool
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const submitLock = useRef(false);
-  const oauthHandled = useRef(false);
-
-  useEffect(() => {
-    if (oauthHandled.current) return;
-
-    const oauthError = searchParams.get("error");
-    if (oauthError) {
-      oauthHandled.current = true;
-      toast.add({
-        title: "Google sign-in failed",
-        description: "Google could not complete sign-in. Please try again.",
-        type: "error",
-      });
-      router.replace("/login");
-      return;
-    }
-
-    if (searchParams.get("oauth") !== "google") return;
-    oauthHandled.current = true;
-
-    authClient.getSession()
-      .then(({ data, error }) => {
-        if (error || !data?.user) {
-          toast.add({
-            title: "Google sign-in was not completed",
-            description: error?.message ?? "No active session was found. Please try again.",
-            type: "error",
-          });
-          router.replace("/login");
-          return;
-        }
-
-        toast.add({
-          title: "Welcome back!",
-          description: "You’re signed in to StudioNest.",
-          type: "success",
-        });
-        router.replace("/");
-      })
-      .catch(() => {
-        toast.add({
-          title: "Could not verify your Google sign-in",
-          description: "Please try signing in again.",
-          type: "error",
-        });
-        router.replace("/login");
-      });
-  }, [router, searchParams]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -130,10 +81,20 @@ export default function LoginForm({ googleConfigured }: { googleConfigured: bool
     setIsSubmitting(true);
 
     try {
-      await authClient.signIn.social({
+      const { error } = await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/login?oauth=google",
+        callbackURL: "/",
       });
+
+      if (error) {
+        toast.add({
+          title: "Google sign-in failed",
+          description: error.message || "Please try again.",
+          type: "error",
+        });
+        submitLock.current = false;
+        setIsSubmitting(false);
+      }
     } catch (error) {
       toast.add({
         title: "Google sign-in failed",
@@ -153,8 +114,7 @@ export default function LoginForm({ googleConfigured }: { googleConfigured: bool
     });
   }
 
-  const oauthPending = searchParams.get("oauth") === "google";
-  const buttonsBusy = isSubmitting || oauthPending;
+  const buttonsBusy = isSubmitting;
 
   return (
     <Card className="relative z-10 w-full max-w-md overflow-hidden rounded-3xl border-border-soft bg-surface shadow-[0_24px_70px_rgba(47,39,30,0.12)] dark:shadow-black/25">
@@ -177,13 +137,6 @@ export default function LoginForm({ googleConfigured }: { googleConfigured: bool
       </CardHeader>
 
       <CardContent className="px-6 pb-7 pt-5 sm:px-9 sm:pb-9">
-        {oauthPending && (
-          <div role="status" className="mb-4 flex items-center justify-center gap-2 rounded-xl bg-muted px-3 py-2.5 text-sm text-muted-foreground">
-            <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
-            Verifying your Google account…
-          </div>
-        )}
-
         <form noValidate onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="login-email">Email</Label>

@@ -1,33 +1,36 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import {
+  CalendarDays,
+  LayoutDashboard,
+  LoaderCircle,
+  LogOut,
+  Plus,
+  UserRound,
+  Warehouse,
+} from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "@/components/ui/toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   FiAperture,
   FiChevronDown,
-  FiGrid,
-  FiHome,
-  FiLogOut,
   FiMenu,
-  FiPlus,
   FiMoon,
   FiSun,
-  FiUser,
   FiX,
 } from "react-icons/fi";
-
-export type NavbarUser = {
-  name: string;
-  avatarUrl?: string | null;
-};
-
-type NavbarProps = {
-  user?: NavbarUser | null;
-
-  onLogout?: () => void;
-};
 
 const links = [
   { label: "Home", href: "/" },
@@ -37,23 +40,28 @@ const links = [
 ];
 
 const accountLinks = [
-  { label: "Dashboard", href: "/dashboard", icon: FiGrid },
-  { label: "Add New Studio", href: "/add-studio", icon: FiPlus },
-  { label: "My Studio Listings", href: "/my-studios", icon: FiHome },
-  { label: "My Bookings", href: "/bookings", icon: FiUser },
+  { label: "My Profile", href: "/profile", icon: UserRound },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "My Bookings", href: "/my-bookings", icon: CalendarDays },
+  { label: "My Studio Listings", href: "/my-studios", icon: Warehouse },
+  { label: "Add New Studio", href: "/add-studio", icon: Plus },
 ];
 
-export default function Navbar({ user = null, onLogout }: NavbarProps) {
+export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session, isPending, refetch } = authClient.useSession();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
     () => false,
   );
   const { resolvedTheme, setTheme } = useTheme();
+  const user = session?.user;
 
   useEffect(() => {
     const updateScrollState = () => setIsScrolled(window.scrollY > 24);
@@ -73,6 +81,48 @@ export default function Navbar({ user = null, onLogout }: NavbarProps) {
         ? `after:bg-[#302a24] hover:text-[#302a24] ${active ? "text-[#302a24] after:scale-x-100" : "text-[#302a24]/70 hover:after:scale-x-100"}`
         : `after:bg-white hover:text-white ${active ? "text-white after:scale-x-100" : "text-white/75 hover:after:scale-x-100"}`
     }`;
+
+  async function handleLogout() {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+
+    try {
+      const { error } = await authClient.signOut();
+      if (error) {
+        toast.add({
+          title: "Could not log out",
+          description: error.message || "Please try again.",
+          type: "error",
+        });
+        return;
+      }
+
+      setProfileOpen(false);
+      setMobileOpen(false);
+      await refetch();
+      toast.add({
+        title: "Logged out",
+        description: "You have been signed out of StudioNest.",
+        type: "success",
+      });
+      router.replace("/");
+      router.refresh();
+    } catch (error) {
+      toast.add({
+        title: "Could not log out",
+        description: error instanceof Error ? error.message : "Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsSigningOut(false);
+    }
+  }
+
+  function navigateToAccountPage(href: string) {
+    setProfileOpen(false);
+    setMobileOpen(false);
+    router.push(href);
+  }
 
   return (
     <header
@@ -119,22 +169,16 @@ export default function Navbar({ user = null, onLogout }: NavbarProps) {
             onToggle={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
             lightOnHero={!isScrolled && resolvedTheme !== "dark"}
           />
-          {user ? (
-            <div className="relative" onMouseLeave={() => setProfileOpen(false)}>
-              <button
-                type="button"
-                aria-expanded={profileOpen}
-                aria-haspopup="menu"
-                onClick={() => setProfileOpen((open) => !open)}
-                onMouseEnter={() => setProfileOpen(true)}
-                className="flex items-center gap-2 rounded-full border border-white/25 bg-white/10 py-1.5 pl-1.5 pr-3 text-white transition hover:bg-white/20"
-              >
-                <Avatar user={user} />
-                <span className="max-w-28 truncate text-sm font-medium">{user.name}</span>
-                <FiChevronDown aria-hidden="true" className="size-4" />
-              </button>
-              {profileOpen && <ProfileMenu onLogout={onLogout} />}
-            </div>
+          {isPending ? null : user ? (
+            <ProfileDropdown
+              user={user}
+              open={profileOpen}
+              onOpenChange={setProfileOpen}
+              onNavigate={navigateToAccountPage}
+              onLogout={handleLogout}
+              isSigningOut={isSigningOut}
+              lightHeader={isScrolled && resolvedTheme !== "dark"}
+            />
           ) : (
             <>
               <Link href="/login" className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${isScrolled && resolvedTheme !== "dark" ? "text-[#29251f] hover:bg-black/5" : "text-white hover:bg-white/10"}`}>
@@ -174,16 +218,18 @@ export default function Navbar({ user = null, onLogout }: NavbarProps) {
                 {link.label}
               </Link>
             ))}
-            {user ? (
+            {isPending ? null : user ? (
               <>
-                <div className="flex items-center gap-3 py-4 text-white">
-                  <Avatar user={user} />
-                  <span className="font-medium">{user.name}</span>
-                </div>
-                {accountLinks.map(({ label, href }) => (
-                  <Link key={href} href={href} onClick={() => setMobileOpen(false)} className="py-3 text-sm opacity-75">{label}</Link>
-                ))}
-                <button type="button" onClick={onLogout} disabled={!onLogout} className="py-3 text-left text-sm opacity-75 disabled:cursor-not-allowed disabled:opacity-50">Log out</button>
+                <ProfileDropdown
+                  user={user}
+                  open={profileOpen}
+                  onOpenChange={setProfileOpen}
+                  onNavigate={navigateToAccountPage}
+                  onLogout={handleLogout}
+                  isSigningOut={isSigningOut}
+                  lightHeader={resolvedTheme !== "dark"}
+                  mobile
+                />
               </>
             ) : (
               <div className="flex gap-3 pt-5">
@@ -235,34 +281,87 @@ function ThemeToggle({
   );
 }
 
-function Avatar({ user }: { user: NavbarUser }) {
-  return user.avatarUrl ? (
+type SessionUser = NonNullable<ReturnType<typeof authClient.useSession>["data"]>["user"];
+
+function Avatar({ user }: { user: SessionUser }) {
+  return user.image ? (
     <span
       role="img"
-      aria-label={`${user.name}'s profile`}
+      aria-label={`${user.name || user.email}'s profile`}
       className="size-8 shrink-0 rounded-full bg-cover bg-center"
-      style={{ backgroundImage: `url("${user.avatarUrl}")` }}
+      style={{ backgroundImage: `url("${user.image}")` }}
     />
   ) : (
     <span aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#d7bba0] text-xs font-bold text-[#30251d]">
-      {user.name.trim().charAt(0).toUpperCase()}
+      {(user.name || user.email || "U").trim().charAt(0).toUpperCase()}
     </span>
   );
 }
 
-function ProfileMenu({ onLogout }: { onLogout?: () => void }) {
+function ProfileDropdown({
+  user,
+  open,
+  onOpenChange,
+  onNavigate,
+  onLogout,
+  isSigningOut,
+  lightHeader,
+  mobile = false,
+}: {
+  user: SessionUser;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onNavigate: (href: string) => void;
+  onLogout: () => void;
+  isSigningOut: boolean;
+  lightHeader: boolean;
+  mobile?: boolean;
+}) {
+  const displayName = user.name || user.email;
+
   return (
-    <div role="menu" className="absolute right-0 top-full mt-3 w-56 overflow-hidden rounded-2xl border border-border-soft bg-surface p-2 text-foreground shadow-xl shadow-black/20">
-      {accountLinks.map(({ label, href, icon: Icon }) => (
-        <Link key={href} role="menuitem" href={href} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition hover:bg-surface-muted">
-          <Icon aria-hidden="true" className="size-4 text-[#827364]" />
-          {label}
-        </Link>
-      ))}
-      <button type="button" role="menuitem" onClick={onLogout} disabled={!onLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-[#9b493c] transition hover:bg-[#fbf2ef] disabled:cursor-not-allowed disabled:opacity-50">
-        <FiLogOut aria-hidden="true" className="size-4" />
-        Log out
-      </button>
-    </div>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
+      <DropdownMenuTrigger
+        aria-label={`Open account menu for ${displayName}`}
+        className={`flex items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 transition ${
+          mobile
+            ? "my-4 w-full justify-start border-current/15 bg-surface-muted text-foreground hover:bg-muted"
+            : lightHeader
+              ? "border-black/10 bg-black/5 text-[#29251f] hover:bg-black/10"
+              : "border-white/25 bg-white/10 text-white hover:bg-white/20"
+        }`}
+      >
+        <Avatar user={user} />
+        <span className="max-w-40 truncate text-left text-sm font-medium">{displayName}</span>
+        <FiChevronDown aria-hidden="true" className="size-4" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" sideOffset={8} className="w-64 rounded-2xl border border-border-soft bg-surface p-2 text-foreground shadow-xl shadow-black/15">
+        <DropdownMenuLabel className="px-3 py-2">
+          <span className="block truncate text-sm font-semibold text-foreground">{displayName}</span>
+          <span className="mt-0.5 block truncate text-xs font-normal text-muted-foreground">{user.email}</span>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {accountLinks.map(({ label, href, icon: Icon }) => (
+          <DropdownMenuItem
+            key={href}
+            onClick={() => onNavigate(href)}
+            className="cursor-pointer rounded-xl px-3 py-2.5"
+          >
+            <Icon aria-hidden="true" className="size-4 text-muted-foreground" />
+            {label}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={onLogout}
+          disabled={isSigningOut}
+          variant="destructive"
+          className="cursor-pointer rounded-xl px-3 py-2.5"
+        >
+          {isSigningOut ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <LogOut aria-hidden="true" className="size-4" />}
+          {isSigningOut ? "Logging out…" : "Logout"}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
