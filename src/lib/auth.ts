@@ -1,9 +1,16 @@
+
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { jwt } from "better-auth/plugins";
 
-const client = new MongoClient(process.env.MONGODB_URI as string);
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  throw new Error("MONGODB_URI is missing. Check Vercel Environment Variables.");
+}
+
+const client = new MongoClient(MONGODB_URI);
 const db = client.db("studionest");
 
 export const auth = betterAuth({
@@ -28,6 +35,7 @@ export const auth = betterAuth({
           },
         }
       : {},
+
   plugins: [
     jwt({
       jwt: {

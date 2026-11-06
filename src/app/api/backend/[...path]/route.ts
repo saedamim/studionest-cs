@@ -1,7 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 
-const backendUrl = process.env.STUDIO_API_URL || process.env.API_URL || "http://localhost:8000";
+const backendUrl = process.env.STUDIO_API_URL;
+if (!backendUrl) {
+  throw new Error("STUDIO_API_URL is not configured");
+}
 async function proxyRequest(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
