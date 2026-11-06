@@ -40,7 +40,7 @@ const links = [
 ];
 
 const accountLinks = [
-  { label: "My Profile", href: "/profile", icon: UserRound },
+  
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "My Bookings", href: "/dashboard/my-bookings", icon: CalendarDays },
   { label: "My Studio Listings", href: "/dashboard/my-listings", icon: Warehouse },
@@ -255,9 +255,7 @@ function ThemeToggle({
   lightOnHero: boolean;
   onToggle: () => void;
 }) {
-  // Keep the server render and the first client render identical. next-themes
-  // resolves the saved/system theme after hydration, so theme-dependent styles
-  // must wait for mounted just like the icon and accessible label.
+
   const activeThemeIsDark = mounted && isDark;
   const activeLightOnHero = mounted && lightOnHero;
   const Icon = activeThemeIsDark ? FiSun : FiMoon;

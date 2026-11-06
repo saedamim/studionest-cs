@@ -1,4 +1,4 @@
-const API_BASE_URL = "/api/backend";
+const API_BASE_URL = process.env.NEXT_PUBLIC_BETTER_AUTH_URL + "/api/backend";
 
 type ApiErrorBody = { message?: string };
 
