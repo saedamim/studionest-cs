@@ -1,4 +1,5 @@
 
+
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 
@@ -6,8 +7,7 @@ async function proxyRequest(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
 ) {
-  const backendUrl: string | undefined =
-    process.env.STUDIO_API_URL?.trim();
+  const backendUrl = process.env.STUDIO_API_URL?.trim();
 
   if (!backendUrl) {
     return NextResponse.json(
@@ -16,9 +16,7 @@ async function proxyRequest(
     );
   }
 
-  // Remove trailing slash
-  const baseUrl: string = backendUrl.replace(/\/+$/, "");
-
+  const baseUrl = backendUrl.replace(/\/+$/, "");
   const { path } = await context.params;
 
   if (
@@ -34,18 +32,30 @@ async function proxyRequest(
   const apiPath = path.join("/");
   const method = request.method.toUpperCase();
 
+  // Studio create, update, delete
   const isStudioWrite =
-    (apiPath === "studios" || /^studios\/[^/]+$/.test(apiPath)) &&
+    (apiPath === "studios" ||
+      /^studios\/[^/]+$/.test(apiPath)) &&
     method !== "GET";
 
+  // Studio details: GET /studios/:id
+  const isStudioDetails =
+    /^studios\/[^/]+$/.test(apiPath) &&
+    method === "GET";
+
+  // Private routes
   const isPrivateRoute =
     /^my-listings(?:\/[^/]+)?$/.test(apiPath) ||
     apiPath === "my-bookings" ||
+    apiPath === "bookings" ||
     /^bookings\/[^/]+\/cancel$/.test(apiPath);
 
-  const requiresAuth = isStudioWrite || isPrivateRoute;
+  const requiresAuth =
+    isStudioWrite || isStudioDetails || isPrivateRoute;
+
   const headers = new Headers();
 
+  // Authentication
   if (requiresAuth) {
     const session = await auth.api.getSession({
       headers: request.headers,
@@ -69,7 +79,10 @@ async function proxyRequest(
       );
     }
 
-    headers.set("Authorization", `Bearer ${tokenResponse.token}`);
+    headers.set(
+      "Authorization",
+      `Bearer ${tokenResponse.token}`,
+    );
   }
 
   const contentType = request.headers.get("content-type");
@@ -102,7 +115,10 @@ async function proxyRequest(
       upstream.headers.get("content-type");
 
     if (upstreamContentType) {
-      responseHeaders.set("Content-Type", upstreamContentType);
+      responseHeaders.set(
+        "Content-Type",
+        upstreamContentType,
+      );
     }
 
     return new NextResponse(upstream.body, {
@@ -123,3 +139,4 @@ export const GET = proxyRequest;
 export const POST = proxyRequest;
 export const PATCH = proxyRequest;
 export const DELETE = proxyRequest;
+
