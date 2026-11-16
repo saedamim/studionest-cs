@@ -36,12 +36,7 @@ export default function Hero() {
             Explore Studios
             <FiArrowUpRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
-          <Link
-            href="/add-studio"
-            className="flex min-h-14 w-full items-center justify-center rounded-full border border-white/55 bg-white/5 px-7 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15 sm:w-auto"
-          >
-            List Your Space
-          </Link>
+         
         </div>
       </div>
 
