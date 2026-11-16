@@ -165,12 +165,12 @@ export default function Footer() {
         <div className="mt-12 flex flex-col gap-5 border-t border-border-soft pt-6 sm:mt-16 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-foreground-muted">© 2026 StudioNest. All rights reserved.</p>
           <nav aria-label="Legal" className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <Link href="/privacy" className="text-xs text-foreground-muted transition-colors hover:text-foreground">
+            <p className="text-xs text-foreground-muted transition-colors hover:text-foreground">
               Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-xs text-foreground-muted transition-colors hover:text-foreground">
+            </p>
+            <p className="text-xs text-foreground-muted transition-colors hover:text-foreground">
               Terms &amp; Conditions
-            </Link>
+            </p>
             <Link href="/studios" aria-label="Explore studios" className="hidden items-center gap-1 text-xs text-[#92765b] transition-colors hover:text-foreground dark:text-[#e2c7a8] md:inline-flex">
               Find a space <FiArrowUpRight aria-hidden="true" className="size-3.5" />
             </Link>
