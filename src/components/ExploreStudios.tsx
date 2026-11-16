@@ -18,6 +18,7 @@ import {
   FiStar,
 } from "react-icons/fi";
 import { apiFetch } from "@/lib/api";
+import { StudioCard, StudioCardData } from "./StudioCard";
 
 // Studio category type
 type StudioCategory =
@@ -63,36 +64,10 @@ const categoryAliases: Record<string, StudioCategory> = {
   "art workshops": "Art Workshops",
 };
 
-// Frontend Studio type
-type Studio = {
-  id: string;
-  name: string;
-  category: StudioCategory;
-  location: string;
-  hourlyRate: number;
-  rating?: number;
-  reviewCount?: number;
-  imageUrl: string;
-  description?: string;
-};
 
-// Backend Studio type
-type StudioApiRecord = {
-  _id: string;
-  name: string;
-  category: string;
-  location: string;
-  hourlyRate?: number;
-  price?: number;
-  rating?: number;
-  reviewCount?: number;
-  imageUrl?: string;
-  image?: string;
-  description?: string;
-};
 
 // Convert backend data to frontend data
-function normalizeStudio(studio: StudioApiRecord): Studio {
+function normalizeStudio(studio: StudioCardData) {
   const normalizedCategory = studio.category.trim().toLowerCase();
 
   const category =
@@ -103,14 +78,14 @@ function normalizeStudio(studio: StudioApiRecord): Studio {
     (studio.category as StudioCategory);
 
   return {
-    id: studio._id,
+    _id: studio._id,
     name: studio.name,
     category,
     location: studio.location,
-    hourlyRate: studio.hourlyRate ?? studio.price ?? 0,
+    hourlyRate: studio.hourlyRate ?? 0,
     rating: studio.rating,
     reviewCount: studio.reviewCount,
-    imageUrl: studio.imageUrl ?? studio.image ?? "",
+    imageUrl: studio.imageUrl ?? "",
     description: studio.description,
   };
 }
@@ -120,7 +95,7 @@ export default function ExploreStudios() {
     useState<(typeof categories)[number]>("All Spaces");
 
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [studios, setStudios] = useState<Studio[]>([]);
+  const [studios, setStudios] = useState<StudioCardData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
@@ -128,7 +103,7 @@ export default function ExploreStudios() {
   useEffect(() => {
     let active = true;
 
-    apiFetch<{ studios: StudioApiRecord[] }>(
+    apiFetch<{ studios: StudioCardData[] }>(
       "/studios?page=1&limit=50",
     )
       .then((response) => {
@@ -277,82 +252,10 @@ export default function ExploreStudios() {
             <CarouselContent className="-ml-4">
               {visibleStudios.map((studio) => (
                 <CarouselItem
-                  key={studio.id}
+                  key={studio._id}
                   className="pl-4 sm:basis-1/2 lg:basis-1/3"
                 >
-                  <article className="group h-full overflow-hidden rounded-[1.4rem] border border-border-soft bg-surface shadow-[0_8px_28px_rgba(47,39,30,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_42px_rgba(47,39,30,0.12)] dark:shadow-black/15 dark:hover:shadow-black/35">
-
-                    <Link
-                      href={`/studios/${studio.id}`}
-                      className="block"
-                    >
-                      {/* Studio image */}
-                      <div className="relative aspect-4/3 overflow-hidden bg-surface-muted">
-                        <div
-                          role="img"
-                          aria-label={studio.name}
-                          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                          style={{
-                            backgroundImage: `url("${studio.imageUrl || "/images/studio-placeholder.jpg"}")`,
-                          }}
-                        />
-
-                        <span className="absolute left-4 top-4 rounded-full border border-white/30 bg-black/35 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur-md">
-                          {studio.category}
-                        </span>
-                      </div>
-
-                      {/* Studio information */}
-                      <div className="p-5 sm:p-6">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <h3 className="truncate font-serif text-xl font-medium tracking-[-0.02em] text-foreground sm:text-2xl">
-                              {studio.name}
-                            </h3>
-
-                            <p className="mt-2 flex items-center gap-1.5 text-sm text-foreground-muted">
-                              <FiMapPin
-                                aria-hidden="true"
-                                className="size-3.5 shrink-0"
-                              />
-                              {studio.location}
-                            </p>
-                          </div>
-
-                          <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-foreground">
-                            <FiStar
-                              aria-hidden="true"
-                              className="size-4 fill-[#d7a85e] text-[#d7a85e]"
-                            />
-                            {typeof studio.rating === "number"
-                              ? studio.rating.toFixed(1)
-                              : "New"}
-                          </span>
-                        </div>
-
-                        <div className="mt-5 flex items-center justify-between border-t border-border-soft pt-4">
-                          <p className="text-sm text-foreground-muted">
-                            <span className="text-lg font-semibold text-foreground">
-                              ৳{studio.hourlyRate}
-                            </span>{" "}
-                            / hour
-                          </p>
-
-                          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#765f48] transition-colors group-hover:text-foreground dark:text-[#d7bba0]">
-                            View Details
-                            <FiArrowUpRight className="size-4" />
-                          </span>
-                        </div>
-
-                        {typeof studio.rating === "number" && (
-                          <span className="sr-only">
-                            Rated {studio.rating} out of 5 from{" "}
-                            {studio.reviewCount ?? 0} reviews
-                          </span>
-                        )}
-                      </div>
-                    </Link>
-                  </article>
+                  <StudioCard key={studio._id} studio={studio} />
                 </CarouselItem>
               ))}
             </CarouselContent>

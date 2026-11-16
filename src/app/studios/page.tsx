@@ -1,45 +1,17 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { apiFetch } from "@/lib/api";
+import { StudioCard, StudioCardData } from "@/components/StudioCard";
 
-interface StudioApiRecord {
-  _id: string;
-  name: string;
-  category: string;
-  location: string;
-  price?: number;
-  image?: string;
-  hourlyRate?: number;
-  imageUrl?: string;
-  rating?: number;
-  description: string;
+
+interface StudiosResponse {
+  studios: StudioCardData[];
+  // add total, page, etc. if your backend returns them
 }
 
-interface FeaturedStudio {
-  _id: string;
-  name: string;
-  category: string;
-  location: string;
-  price: number;
-  image: string;
-  rating?: number;
-  description: string;
-}
-
-async function getFeaturedStudios(): Promise<{ studios: FeaturedStudio[]; error: string | null }> {
+async function getFeaturedStudios(): Promise<{ studios: StudioCardData[]; error: string | null }> {
   try {
-    const records = await apiFetch<StudioApiRecord[]>("/studios/featured?limit=6");
-    const studios = records.slice(0, 6).map((studio) => ({
-      _id: studio._id,
-      name: studio.name,
-      category: studio.category,
-      location: studio.location,
-      price: studio.price ?? studio.hourlyRate ?? 0,
-      image: studio.image ?? studio.imageUrl ?? "",
-      rating: studio.rating,
-      description: studio.description,
-    }));
-
+    const {studios} = await apiFetch<StudiosResponse>("/studios?limit=6");
     return { studios, error: null };
   } catch (error) {
     console.error("Could not load featured studios:", error);
@@ -81,32 +53,7 @@ async function FeaturedStudios() {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {studios.map((studio) => (
-          <div
-            key={studio._id}
-            className="overflow-hidden rounded-xl border"
-          >
-            {studio.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={studio.image} alt={studio.name} className="h-52 w-full object-cover" />
-            ) : (
-              <div role="img" aria-label={`${studio.name} image unavailable`} className="flex h-52 items-center justify-center bg-surface-muted text-sm text-foreground-muted">
-                Image unavailable
-              </div>
-            )}
-
-            <div className="space-y-2 p-4">
-              <h2 className="text-xl font-semibold">{studio.name}</h2>
-
-              <p>{studio.category}</p>
-              <p>{studio.location}</p>
-              <p>{studio.description}</p>
-
-              <div className="flex justify-between">
-                <span>৳{studio.price}/hour</span>
-                <span>⭐ {typeof studio.rating === "number" ? studio.rating.toFixed(1) : "New"}</span>
-              </div>
-            </div>
-          </div>
+          <StudioCard key={studio._id} studio={studio} />
         ))}
         </div>
       )}
